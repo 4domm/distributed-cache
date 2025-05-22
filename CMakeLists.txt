@@ -1,8 +1,18 @@
 cmake_minimum_required(VERSION 3.28)
-project(keyvalue)
+project(distributed-cache)
 
-set(CMAKE_CXX_STANDARD 17)
+find_package(Poco REQUIRED COMPONENTS Net JSON Util Foundation)
 
-add_executable(keyvalue main.cpp
-        hashmap.h
-        hashmap.cpp)
+add_executable(distributed-cache src/main.cpp
+        src/hashmap.h
+        src/hashmap.cpp
+        src/storage.cpp
+        src/network.cpp
+        src/storage.h
+        src/network.h)
+target_link_libraries(distributed-cache
+        Poco::Net
+        Poco::JSON
+        Poco::Util
+        Poco::Foundation
+)
