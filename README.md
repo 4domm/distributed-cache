@@ -1,1 +1,1 @@
-# simple key value storage in pure cpp
+# simple key value storage for caching (similar to redis or memcached)
