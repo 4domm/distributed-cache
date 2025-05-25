@@ -29,7 +29,6 @@ struct HashTable {
     }
 
     void insert(char *key, char *value) {
-
     }
 };
 

@@ -10,8 +10,9 @@ public:
 
     size_t remove(const std::string &key);
 
-
     std::optional<std::reference_wrapper<std::string> > get(const std::string &key);
+
+    static std::pair<int, int> getLoad();
 
 private:
     std::unordered_map<std::string, std::string> cache;

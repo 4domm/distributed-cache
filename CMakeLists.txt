@@ -9,7 +9,8 @@ add_executable(distributed-cache src/main.cpp
         src/storage.cpp
         src/network.cpp
         src/storage.h
-        src/network.h)
+        src/network.h
+        )
 target_link_libraries(distributed-cache
         Poco::Net
         Poco::JSON
