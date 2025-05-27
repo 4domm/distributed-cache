@@ -1,0 +1,35 @@
+import redis
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+total = 10000
+max_workers = 10
+
+latencies = []
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+def send_request(i):
+    key = f'key{i}'
+    value = f'value{i}'
+    start = time.time()
+    try:
+        r.set(key, value)
+        elapsed = (time.time() - start) * 1000
+        latencies.append(elapsed)
+    except Exception as e:
+        elapsed = (time.time() - start) * 1000
+        latencies.append(elapsed)
+        return f"Exception for {key}: {e}"
+    return None
+
+with ThreadPoolExecutor(max_workers=max_workers) as executor:
+    futures = [executor.submit(send_request, i) for i in range(total)]
+    for future in as_completed(futures):
+        result = future.result()
+        if result:
+            print(result)
+
+if latencies:
+    avg_latency = sum(latencies) / len(latencies)
+    print(f"\nAverage latency: {avg_latency:.2f} ms")

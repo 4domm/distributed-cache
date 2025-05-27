@@ -3,14 +3,11 @@ project(distributed-cache)
 
 find_package(Poco REQUIRED COMPONENTS Net JSON Util Foundation)
 
-add_executable(distributed-cache src/main.cpp
-        src/hashmap.h
-        src/hashmap.cpp
-        src/storage.cpp
-        src/network.cpp
-        src/storage.h
-        src/network.h
-        )
+add_executable(distributed-cache main.cpp
+        hashmap.cpp
+        network.cpp
+)
+
 target_link_libraries(distributed-cache
         Poco::Net
         Poco::JSON
