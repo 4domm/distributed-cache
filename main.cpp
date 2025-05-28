@@ -7,14 +7,14 @@
 #include "network.h"
 
 void setup() {
-    Poco::Net::ServerSocket serverSocket(8080);
+    const Poco::Net::ServerSocket serverSocket(8080);
     auto *storage = new KVstorage(new LRUCache<std::string, std::string>);
     auto *params = new Poco::Net::HTTPServerParams();
-    params->setMaxThreads(8);
+    params->setMaxThreads(24);
     params->setKeepAlive(true);
     Poco::Net::HTTPServer server(new HandlerFactory(storage), serverSocket, params);
     server.start();
-
+    storage->startEviction();
     std::cout << "started" << std::endl;
     std::cin.get();
     server.stop();

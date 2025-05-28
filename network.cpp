@@ -7,7 +7,7 @@
 #include "network.h"
 
 
-GetHandler::GetHandler(KVstorage<std::string,std::string> *storage) : storage(storage) {
+GetHandler::GetHandler(KVstorage<std::string, std::string> *storage) : storage(storage) {
 }
 
 void GetHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) {
@@ -32,11 +32,11 @@ void GetHandler::handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net:
 }
 
 
-PutHandler::PutHandler(KVstorage<std::string,std::string> *storage) : storage(storage) {
+PutHandler::PutHandler(KVstorage<std::string, std::string> *storage) : storage(storage) {
 }
 
 void PutHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
-                               Poco::Net::HTTPServerResponse &response){
+                               Poco::Net::HTTPServerResponse &response) {
     const Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
     response.setContentType("application/json");
     try {
@@ -51,11 +51,11 @@ void PutHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
 }
 
 
-DeleteHandler::DeleteHandler(KVstorage<std::string,std::string> *storage) : storage(storage) {
+DeleteHandler::DeleteHandler(KVstorage<std::string, std::string> *storage) : storage(storage) {
 }
 
 void DeleteHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
-                                  Poco::Net::HTTPServerResponse &response){
+                                  Poco::Net::HTTPServerResponse &response) {
     const Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
     response.setContentType("application/json");
     try {
@@ -70,17 +70,16 @@ void DeleteHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
 }
 
 
-StatHandler::StatHandler(KVstorage<std::string,std::string> *storage) : storage(storage) {
+StatHandler::StatHandler(KVstorage<std::string, std::string> *storage) : storage(storage) {
 }
 
 void StatHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
-                                Poco::Net::HTTPServerResponse &response){
-    const Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
+                                Poco::Net::HTTPServerResponse &response) {
+    Poco::JSON::Object::Ptr json = new Poco::JSON::Object;
     response.setContentType("application/json");
+
     try {
-        Poco::JSON::Parser parser;
-        Poco::JSON::Object::Ptr reqData = parser.parse(request.stream()).extract<Poco::JSON::Object::Ptr>();
-        storage->remove(reqData->getValue<std::string>("key"));
+        json->set("mem", KVstorage<std::basic_string<char>, std::basic_string<char>>::getLoad());
     } catch (...) {
         response.setStatus(Poco::Net::HTTPServerResponse::HTTP_BAD_REQUEST);
     }
@@ -89,11 +88,11 @@ void StatHandler::handleRequest(Poco::Net::HTTPServerRequest &request,
 }
 
 
-HandlerFactory::HandlerFactory(KVstorage<std::string,std::string> *storage) : storage(storage) {
+HandlerFactory::HandlerFactory(KVstorage<std::string, std::string> *storage) : storage(storage) {
 }
 
 Poco::Net::HTTPRequestHandler *
-HandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest &request){
+HandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest &request) {
     if (request.getMethod() != "POST") return nullptr;
     if (request.getURI() == "/put") return new PutHandler(storage);
     if (request.getURI() == "/delete") return new DeleteHandler(storage);

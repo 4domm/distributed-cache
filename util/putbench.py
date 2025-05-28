@@ -1,25 +1,29 @@
-import redis
+import requests
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-total = 10000
+from threading import Lock
+url = 'http://localhost:8080/put'
+total = 100000
 max_workers = 10
-
+latencies_lock = Lock()
 latencies = []
 
-r = redis.Redis(host='localhost', port=6379, db=0)
+session = requests.Session()
+
 
 def send_request(i):
     key = f'key{i}'
     value = f'value{i}'
     start = time.time()
     try:
-        r.set(key, value)
+        session.post(url, json={'key': key, 'value': value})
         elapsed = (time.time() - start) * 1000
-        latencies.append(elapsed)
+        with latencies_lock:
+            latencies.append(elapsed)
     except Exception as e:
         elapsed = (time.time() - start) * 1000
-        latencies.append(elapsed)
+        with latencies_lock:
+            latencies.append(elapsed)
         return f"Exception for {key}: {e}"
     return None
 
