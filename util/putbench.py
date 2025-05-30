@@ -3,7 +3,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 url = 'http://localhost:8080/put'
-total = 100000
+total = 10000
 max_workers = 10
 latencies_lock = Lock()
 latencies = []

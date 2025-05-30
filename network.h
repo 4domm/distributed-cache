@@ -1,59 +1,88 @@
 #pragma once
 #include <Poco/Net/HTTPRequestHandler.h>
-#include "storage.h"
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
-
-#include "cache.h"
+#include "storage.h"
+#include <vector>
+#include <string>
 
 class GetHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    explicit GetHandler(KVstorage<std::string,std::string> *storage);
+    GetHandler(KVstorage<std::string, std::string> *storage,
+               const std::vector<std::string> &shards,
+               int curr)
+        : storage(storage), shards(shards), curr(curr) {
+    }
 
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    void handleRequest(Poco::Net::HTTPServerRequest &request,
+                       Poco::Net::HTTPServerResponse &response) override;
 
 private:
-    KVstorage<std::string,std::string> *storage;
+    KVstorage<std::string, std::string> *storage;
+    std::vector<std::string> shards;
+    int curr;
 };
-
 
 class PutHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    explicit PutHandler(KVstorage<std::string,std::string> *storage);
+    PutHandler(KVstorage<std::string, std::string> *storage,
+               const std::vector<std::string> &shards,
+               int curr)
+        : storage(storage), shards(shards), curr(curr) {
+    }
 
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    void handleRequest(Poco::Net::HTTPServerRequest &request,
+                       Poco::Net::HTTPServerResponse &response) override;
 
 private:
-    KVstorage<std::string,std::string> *storage;
+    KVstorage<std::string, std::string> *storage;
+    std::vector<std::string> shards;
+    int curr;
 };
-
 
 class DeleteHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    explicit DeleteHandler(KVstorage<std::string,std::string> *storage);
+    DeleteHandler(KVstorage<std::string, std::string> *storage,
+                  const std::vector<std::string> &shards,
+                  int curr)
+        : storage(storage), shards(shards), curr(curr) {
+    }
 
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    void handleRequest(Poco::Net::HTTPServerRequest &request,
+                       Poco::Net::HTTPServerResponse &response) override;
 
 private:
-    KVstorage<std::string,std::string> *storage;
+    KVstorage<std::string, std::string> *storage;
+    std::vector<std::string> shards;
+    int curr;
 };
-
 
 class StatHandler : public Poco::Net::HTTPRequestHandler {
 public:
-    explicit StatHandler(KVstorage<std::string,std::string> *storage);
+    StatHandler(KVstorage<std::string, std::string> *storage
+    )
+        : storage(storage) {
+    }
 
-    void handleRequest(Poco::Net::HTTPServerRequest &request, Poco::Net::HTTPServerResponse &response) override;
+    void handleRequest(Poco::Net::HTTPServerRequest &request,
+                       Poco::Net::HTTPServerResponse &response) override;
 
 private:
-    KVstorage<std::string,std::string> *storage;
+    KVstorage<std::string, std::string> *storage;
 };
 
 class HandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 public:
-    explicit HandlerFactory(KVstorage<std::string,std::string> *storage);
+    HandlerFactory(KVstorage<std::string, std::string> *storage,
+                   const std::vector<std::string> &shards,
+                   int curr)
+        : storage(storage), shards(shards), curr(curr) {
+    }
 
-    Poco::Net::HTTPRequestHandler *createRequestHandler(const Poco::Net::HTTPServerRequest &request) override;
+    Poco::Net::HTTPRequestHandler *createRequestHandler(
+        const Poco::Net::HTTPServerRequest &request) override;
 
 private:
-    KVstorage<std::string,std::string> *storage;
+    KVstorage<std::string, std::string> *storage;
+    std::vector<std::string> shards;
+    int curr;
 };

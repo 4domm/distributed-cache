@@ -7,9 +7,10 @@
 template<typename Key, typename Value>
 class LRUCache : public Cache<Key, Value> {
 public:
-    LRUCache() {
-        map.reserve(10000);
+    LRUCache(unsigned long capacity): capacity(capacity) {
+        map.reserve(capacity);
     }
+
     void put(const Key &key, const Value &value) override {
         auto it = map.find(key);
         if (it != map.end()) {
@@ -36,17 +37,25 @@ public:
         return it->second->second;
     }
 
-    bool evict() override{
-        if (lruList.empty()) return false;
+    void evict() override {
+        if (lruList.empty()) return;
         auto &last = lruList.back();
         map.erase(last.first);
         lruList.pop_back();
-        return true;
+    }
+
+    bool needEvict() override {
+        return map.size() > capacity;
+    }
+
+    size_t size() override {
+        return map.size();
     }
 
 private:
     std::list<std::pair<Key, Value> > lruList;
     std::unordered_map<Key, typename std::list<std::pair<Key, Value> >::iterator> map;
+    unsigned long capacity;
 
     void touch(typename std::unordered_map<Key, typename std::list<std::pair<Key, Value> >::iterator>::iterator it) {
         lruList.splice(lruList.begin(), lruList, it->second);

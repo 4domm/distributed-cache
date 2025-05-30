@@ -10,7 +10,11 @@ public:
 
     virtual std::optional<std::reference_wrapper<Value> > get(const Key &key) = 0;
 
-    virtual bool evict() = 0;
+    virtual void evict() = 0;
+
+    virtual bool needEvict() =0;
+
+    virtual size_t size() =0;
 
     virtual ~Cache() = default;
 };

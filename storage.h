@@ -13,7 +13,7 @@
 template<typename Key, typename Value>
 class KVstorage {
 public:
-    explicit KVstorage(Cache<Key, Value> *cache): cache(cache) {
+    explicit KVstorage(Cache<Key, Value> *cache, unsigned long capacity): cache(cache), capacity(capacity) {
     }
 
     void put(const std::string &key, const std::string &value) {
@@ -31,18 +31,18 @@ public:
         return cache->get(key);
     }
 
-    static double getLoad() {
+    std::pair<double, int> getLoad() {
         std::ifstream statusFile("/proc/self/status");
         std::string line;
 
         while (std::getline(statusFile, line)) {
             if (line.compare(0, 6, "VmRSS:") == 0) {
                 if (const size_t pos = line.find_first_of("0123456789"); pos != std::string::npos) {
-                    return static_cast<double>(std::stoi(line.substr(pos))) / 1024.0;
+                    return std::pair{static_cast<double>(std::stoi(line.substr(pos))) / 1024.0, cache->size()};
                 }
             }
         }
-        return 0;
+        return {0, 0};
     }
 
     void startEviction() {
@@ -53,17 +53,13 @@ public:
 
         evictionTask = std::async(std::launch::async, [this] {
             while (runningEviction.load()) {
-                std::this_thread::sleep_for(std::chrono::seconds(15));
+                std::this_thread::sleep_for(std::chrono::seconds(3));
 
-                constexpr double target = 15 * 0.95;
                 int attempts = 0;
-                double memoryUsage = getLoad();
-                while (memoryUsage > target && attempts++ < 400) {
+                while (cache->needEvict() && attempts++ < 4000) {
                     {
                         std::unique_lock lock(mutex);
                         cache->evict();
-                        std::cout << "Evicted. Current memory usage: " << memoryUsage << " MB" << std::endl;
-                        memoryUsage = getLoad();
                     }
                 }
             }
@@ -81,6 +77,7 @@ public:
 private:
     Cache<Key, Value> *cache;
     std::shared_mutex mutex;
+    unsigned long capacity;
     std::atomic<bool> runningEviction{false};
     std::future<void> evictionTask;
 };
