@@ -13,10 +13,11 @@ add_executable(distributed-cache main.cpp
         lfu_cache.h
         arc_cache.h
         twoq_cache.h
+        random_cache.h
 )
 
 add_executable(bench_kv
-        benchlru.cpp
+        bench.cpp
         lru_cache.h
         storage.h
 )

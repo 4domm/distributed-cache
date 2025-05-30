@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  cache0:
+    image: distributed-cache:latest
+    container_name: cache0
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./config.cfg:/app/config.cfg:ro
+    ports:
+      - "8080:8080"
+    command: ["0", "/app/config.cfg"]
+
+  cache1:
+    image: distributed-cache:latest
+    container_name: cache1
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./config.cfg:/app/config.cfg:ro
+    ports:
+      - "8081:8081"
+    command: ["1", "/app/config.cfg"]
+
+  cache2:
+    image: distributed-cache:latest
+    container_name: cache2
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./config.cfg:/app/config.cfg:ro
+    ports:
+      - "8082:8082"
+    command: ["2", "/app/config.cfg"]
+networks:
+  default:
+    driver: bridge

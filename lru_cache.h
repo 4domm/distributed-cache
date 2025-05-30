@@ -7,7 +7,7 @@
 template<typename Key, typename Value>
 class LRUCache : public Cache<Key, Value> {
 public:
-    LRUCache(unsigned long capacity): capacity(capacity) {
+    explicit LRUCache(unsigned long capacity): capacity(capacity) {
         map.reserve(capacity);
     }
 

@@ -23,7 +23,7 @@ public:
           size_(0) {
     }
 
-    std::optional<Value> get(const Key &key) {
+    std::optional<std::reference_wrapper<Value> > get(const Key &key) {
         helpRehash();
         std::size_t h = hasher_(key);
         if (auto val = findIn(newer_, h, key).has_value()) return val;

@@ -12,6 +12,7 @@ class LFUCache : public Cache<Key, Value> {
 public:
     explicit LFUCache(size_t capacity)
         : capacity(capacity), size_(0) {
+        byKey.reserve(capacity);
     }
 
     void put(const Key &key, const Value &value) override {
