@@ -1,6 +1,6 @@
 # Distributed Cache
 
-A simple key–value cache with pluggable eviction policies (LRU, LFU, 2Q, ARC).
+A simple key–value storage implemented in cpp(this cpp code is bad).
 
 ---
 
