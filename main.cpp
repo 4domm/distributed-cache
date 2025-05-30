@@ -74,15 +74,19 @@ int main(int argc, char **argv) {
     auto *params = new Poco::Net::HTTPServerParams;
     params->setMaxThreads(24);
     params->setKeepAlive(true);
+    int ttl = 36000;
+    if (auto it = cfg.find("ttl"); it != cfg.end()) {
+        ttl = std::atoi(it->second.c_str());
+    }
     Cache<std::string, std::string> *cache = nullptr;
-    if (algo == "lru") cache = new LRUCache<std::string, std::string>(capacity);
-    else if (algo == "lfu") cache = new LFUCache<std::string, std::string>(capacity);
-    else if (algo == "2q") cache = new TwoQCache<std::string, std::string>(capacity);
-    else if (algo == "arc") cache = new ARCCache<std::string, std::string>(capacity);
-    else if (algo == "rand") cache = new RandomCache<std::string, std::string>(capacity);
+    if (algo == "lru") cache = new LRUCache<std::string, std::string>(capacity, ttl);
+    else if (algo == "lfu") cache = new LFUCache<std::string, std::string>(capacity, ttl);
+    else if (algo == "2q") cache = new TwoQCache<std::string, std::string>(capacity, ttl);
+    else if (algo == "arc") cache = new ARCCache<std::string, std::string>(capacity, ttl);
+    else if (algo == "rand") cache = new RandomCache<std::string, std::string>(capacity,ttl);
     else {
         std::cerr << "Unknown algorithm: " << algo << std::endl;
-        cache = new LRUCache<std::string, std::string>(capacity);
+        cache = new LRUCache<std::string, std::string>(capacity, ttl);
     }
     auto *storage = new KVstorage(cache, capacity);
     Poco::Net::HTTPServer server(new HandlerFactory(storage, shards, instance), socket, params);

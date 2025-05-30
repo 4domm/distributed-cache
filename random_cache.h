@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <vector>
@@ -6,14 +5,16 @@
 #include <random>
 #include <optional>
 #include <functional>
+#include <chrono>
 
 #include "cache.h"
 
 template<typename Key, typename Value>
 class RandomCache : public Cache<Key, Value> {
 public:
-    explicit RandomCache(size_t capacity)
+    explicit RandomCache(size_t capacity, int ttl_seconds)
         : capacity_(capacity),
+          ttl_(ttl_seconds),
           engine_(std::random_device{}())
     {
         map_.reserve(capacity_);
@@ -21,13 +22,17 @@ public:
     }
 
     void put(const Key& key, const Value& value) override {
+        auto now_time = now();
+        auto expiration = now_time + std::chrono::seconds(ttl_);
+
         auto it = map_.find(key);
         if (it != map_.end()) {
-            it->second.first = value;
+            it->second.value = value;
+            it->second.expiration = expiration;
         }
         else {
             keys_.push_back(key);
-            map_[key] = { value, keys_.size() - 1 };
+            map_[key] = { value, keys_.size() - 1, expiration };
         }
     }
 
@@ -35,12 +40,12 @@ public:
         auto it = map_.find(key);
         if (it == map_.end()) return 0;
 
-        size_t idx = it->second.second;
+        size_t idx = it->second.index;
         Key lastKey = keys_.back();
 
         if (idx != keys_.size() - 1) {
             keys_[idx] = lastKey;
-            map_[lastKey].second = idx;
+            map_[lastKey].index = idx;
         }
 
         keys_.pop_back();
@@ -51,7 +56,13 @@ public:
     std::optional<std::reference_wrapper<Value>> get(const Key& key) override {
         auto it = map_.find(key);
         if (it == map_.end()) return std::nullopt;
-        return std::ref(it->second.first);
+
+        if (expired(it->second)) {
+            remove(key);
+            return std::nullopt;
+        }
+
+        return std::ref(it->second.value);
     }
 
     void evict() override {
@@ -70,9 +81,23 @@ public:
     }
 
 private:
-    size_t capacity_;
-    std::vector<Key> keys_;
-    std::unordered_map<Key, std::pair<Value, size_t>> map_;
+    struct Item {
+        Value value;
+        size_t index;
+        std::chrono::steady_clock::time_point expiration;
+    };
 
+    size_t capacity_;
+    int ttl_;
+    std::vector<Key> keys_;
+    std::unordered_map<Key, Item> map_;
     std::mt19937 engine_;
+
+    static std::chrono::steady_clock::time_point now() {
+        return std::chrono::steady_clock::now();
+    }
+
+    bool expired(const Item& item) const {
+        return now() > item.expiration;
+    }
 };

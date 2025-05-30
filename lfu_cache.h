@@ -4,35 +4,47 @@
 #include <unordered_set>
 #include <optional>
 #include <functional>
+#include <chrono>
 
 #include "cache.h"
 
 template<typename Key, typename Value>
 class LFUCache : public Cache<Key, Value> {
 public:
-    explicit LFUCache(size_t capacity)
-        : capacity(capacity), size_(0) {
+    explicit LFUCache(size_t capacity, int ttl_seconds)
+        : capacity(capacity), size_(0), ttl(ttl_seconds) {
         byKey.reserve(capacity);
     }
 
     void put(const Key &key, const Value &value) override {
+        auto now_time = now();
+        auto expiration_time = now_time + std::chrono::seconds(ttl);
+
         auto it = byKey.find(key);
         if (it != byKey.end()) {
             it->second->value = value;
+            it->second->expiration = expiration_time;
             increment(it->second);
         } else {
-            auto *item = new CacheItem{key, value, freqs.end()};
+            auto *item = new CacheItem{key, value, freqs.end(), expiration_time};
             byKey[key] = item;
             ++size_;
             increment(item);
         }
     }
 
-    std::optional<std::reference_wrapper<Value> > get(const Key &key) override {
+    std::optional<std::reference_wrapper<Value>> get(const Key &key) override {
         auto it = byKey.find(key);
         if (it == byKey.end()) return std::nullopt;
-        increment(it->second);
-        return it->second->value;
+
+        auto *item = it->second;
+        if (expired(item)) {
+            remove(key);
+            return std::nullopt;
+        }
+
+        increment(item);
+        return item->value;
     }
 
     size_t remove(const Key &key) override {
@@ -77,12 +89,22 @@ private:
         Key key;
         Value value;
         typename std::list<FrequencyItem>::iterator freqIter;
+        std::chrono::steady_clock::time_point expiration;
     };
 
     std::unordered_map<Key, CacheItem *> byKey;
     std::list<FrequencyItem> freqs;
     size_t capacity;
     size_t size_;
+    int ttl;
+
+    static std::chrono::steady_clock::time_point now() {
+        return std::chrono::steady_clock::now();
+    }
+
+    bool expired(CacheItem *item) {
+        return now() > item->expiration;
+    }
 
     void increment(CacheItem *item) {
         auto curIt = item->freqIter;
@@ -121,7 +143,6 @@ private:
             freqs.erase(freqIt);
         }
     }
-
 
     void evict(size_t count) {
         size_t removed = 0;
