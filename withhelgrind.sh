@@ -1,1 +1,1 @@
-valgrind --tool=helgrind ./cmake-build-debug/distributed-cache
+valgrind --tool=helgrind ./cmake-build-debug/distributed-cache 0
