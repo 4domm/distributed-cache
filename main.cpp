@@ -3,11 +3,9 @@
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 #include <iostream>
 
-#include "arc_cache.h"
 #include "lru_cache.h"
 #include "network.h"
 #include "lfu_cache.h"
-#include "twoq_cache.h"
 #include "random_cache.h"
 
 std::unordered_map<std::string, std::string> parseConfig(const std::string &filename) {
@@ -28,7 +26,6 @@ std::unordered_map<std::string, std::string> parseConfig(const std::string &file
 
         std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
-
         result[key] = value;
     }
 
@@ -81,9 +78,7 @@ int main(int argc, char **argv) {
     Cache<std::string, std::string> *cache = nullptr;
     if (algo == "lru") cache = new LRUCache<std::string, std::string>(capacity, ttl);
     else if (algo == "lfu") cache = new LFUCache<std::string, std::string>(capacity, ttl);
-    else if (algo == "2q") cache = new TwoQCache<std::string, std::string>(capacity, ttl);
-    else if (algo == "arc") cache = new ARCCache<std::string, std::string>(capacity, ttl);
-    else if (algo == "rand") cache = new RandomCache<std::string, std::string>(capacity,ttl);
+    else if (algo == "rand") cache = new RandomCache<std::string, std::string>(capacity, ttl);
     else {
         std::cerr << "Unknown algorithm: " << algo << std::endl;
         cache = new LRUCache<std::string, std::string>(capacity, ttl);

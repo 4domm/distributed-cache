@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libpoco-dev && 
 WORKDIR /app
 
 COPY --from=builder /app/build/distributed-cache /app/distributed-cache
-COPY config.cfg /app/config.cfg
+COPY exampleconfig.cfg /app/config.cfg
 
 RUN chmod +x /app/distributed-cache
 

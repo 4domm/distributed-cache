@@ -1,6 +1,6 @@
 # Distributed Cache
 
-A simple key–value storage implemented in cpp(this cpp code is bad).
+A simple key–value storage implemented in cpp(i think this cpp code is bad).
 
 ---
 
@@ -18,7 +18,7 @@ A simple key–value storage implemented in cpp(this cpp code is bad).
 ## Features
 
 - In-memory key–value storage
-- Configurable eviction: **LRU**, **LFU**, **2Q**, **ARC**, **Random**
+- Configurable eviction: **LRU**, **LFU**, **Random**
 - Sharding 
 - Simple HTTP API (`/get`, `/put`, `/delete`, `/stat`)
 
@@ -41,7 +41,7 @@ docker build -t distributed-cache:latest .
 ```
 ## Run-a-single-shard
 ```bash
-docker run -it --rm -p 8080:8080 distributed-cache:latest  0 config.cfg
+docker run -it --rm -p 8080:8080 distributed-cache:latest  0 exampleconfig.cfg
 ```
 ## Run-multiple-shards-docker-compose
 ```bash

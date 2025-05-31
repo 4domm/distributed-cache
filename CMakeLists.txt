@@ -11,15 +11,7 @@ add_executable(distributed-cache main.cpp
         storage.h
         lru_cache.h
         lfu_cache.h
-        arc_cache.h
-        twoq_cache.h
         random_cache.h
-)
-
-add_executable(bench_kv
-        bench.cpp
-        lru_cache.h
-        storage.h
 )
 
 target_link_libraries(distributed-cache
