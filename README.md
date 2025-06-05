@@ -1,12 +1,11 @@
 # Distributed Cache
 
-A simple key–value storage implemented in cpp(i think this cpp code is bad).
+A simple key–value storage implemented in cpp(this cpp code is bad).
 
 ---
 
 ## Table of Contents
 
-- [Features](#features)
 - [Getting Started](#getting-started)
     - [Clone the repo](#clone-the-repo)
     - [Build with Docker](#build-with-docker)
@@ -18,7 +17,7 @@ A simple key–value storage implemented in cpp(i think this cpp code is bad).
 ## Features
 
 - In-memory key–value storage
-- Configurable eviction: **LRU**, **LFU**, **Random**
+- Configurable eviction: **LRU**, **LFU**, **Random** and also **TTL**
 - Sharding 
 - Simple HTTP API (`/get`, `/put`, `/delete`, `/stat`)
 
