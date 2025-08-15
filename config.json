@@ -1,0 +1,6 @@
+{
+  "shards": ["localhost:8080", "localhost:8081"],
+  "capacity": 8000,
+  "algo": "rand",
+  "ttl": 10
+}

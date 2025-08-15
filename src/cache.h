@@ -8,7 +8,7 @@ public:
 
     virtual size_t remove(const Key &key) = 0;
 
-    virtual std::optional<std::reference_wrapper<Value> > get(const Key &key) = 0;
+    virtual std::optional<Value> get(const Key &key) = 0;
 
     virtual void evict() = 0;
 

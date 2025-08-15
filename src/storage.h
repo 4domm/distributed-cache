@@ -26,24 +26,11 @@ public:
         return cache->remove(key);
     }
 
-    std::optional<std::reference_wrapper<std::string> > get(const std::string &key) {
+    std::optional<std::string> get(const std::string &key) {
         std::shared_lock lock(mutex);
         return cache->get(key);
     }
 
-    std::pair<double, int> getLoad() {
-        std::ifstream statusFile("/proc/self/status");
-        std::string line;
-
-        while (std::getline(statusFile, line)) {
-            if (line.compare(0, 6, "VmRSS:") == 0) {
-                if (const size_t pos = line.find_first_of("0123456789"); pos != std::string::npos) {
-                    return std::pair{static_cast<double>(std::stoi(line.substr(pos))) / 1024.0, cache->size()};
-                }
-            }
-        }
-        return {0, 0};
-    }
 
     void startEviction() {
         if (runningEviction.load()) {

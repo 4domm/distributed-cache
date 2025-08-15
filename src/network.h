@@ -56,19 +56,6 @@ private:
     int curr;
 };
 
-class StatHandler : public Poco::Net::HTTPRequestHandler {
-public:
-    StatHandler(KVstorage<std::string, std::string> *storage
-    )
-        : storage(storage) {
-    }
-
-    void handleRequest(Poco::Net::HTTPServerRequest &request,
-                       Poco::Net::HTTPServerResponse &response) override;
-
-private:
-    KVstorage<std::string, std::string> *storage;
-};
 
 class HandlerFactory : public Poco::Net::HTTPRequestHandlerFactory {
 public:

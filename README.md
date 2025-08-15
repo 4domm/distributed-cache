@@ -1,26 +1,16 @@
-# Distributed Cache
+# timkv
 
-A simple key–value storage implemented in cpp(i think this cpp code is bad).
-
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Getting Started](#getting-started)
-    - [Clone the repo](#clone-the-repo)
-    - [Build with Docker](#build-with-docker)
-    - [Run a Single Shard](#run-a-single-shard)
-    - [Run Multiple Shards (Docker Compose)](#run-multiple-shards-docker-compose)
+A simple key–value storage implemented in cpp
 
 ---
+
 
 ## Features
 
-- In-memory key–value storage
-- Configurable eviction: **LRU**, **LFU**, **Random**
+- In-memory key–value storage based on redis-like hashmap
+- Configurable eviction: **LRU**, **LFU**
 - Sharding 
-- Simple HTTP API (`/get`, `/put`, `/delete`, `/stat`)
+- Simple HTTP API (`/get`, `/put`, `/delete`)
 
 ---
 
@@ -32,18 +22,19 @@ A simple key–value storage implemented in cpp(i think this cpp code is bad).
 ### Clone the repo
 
 ```bash
-git clone https://github.com/4domm/distributed-cache.git
-cd distributed-cache
+git clone --recurse-submodules https://github.com/4domm/timkv.git
+cd timkv
 ```
-## Build-with-docker
+
+### Build with Makefile
+
 ```bash
-docker build -t distributed-cache:latest .
+make
 ```
-## Run-a-single-shard
+
+### Or run with Makefile
+
 ```bash
-docker run -it --rm -p 8080:8080 distributed-cache:latest  0 exampleconfig.cfg
+make run <SHARD=0> <config.json>
 ```
-## Run-multiple-shards-docker-compose
-```bash
-docker-compose up --build
-```
+
