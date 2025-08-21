@@ -1,6 +1,6 @@
 # timkv
 
-A simple key–value storage implemented in cpp
+simple in-memory key–value storage
 
 ---
 
